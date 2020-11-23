@@ -126,6 +126,50 @@ for line in data3:
 data3.close()
 
 
+##Grabbing Chemical Shift Values from parameters.fit file. 
+##Make sure it's in the same directory!
+
+
+file=open('parameters.fit', 'r')
+number = len(residues1)#number of residues will pull from residue list##
+##line 9-9+number will be CS_A
+
+residuelist=[]
+cs_a={}
+cs_b={}
+cs_b_error={}
+
+content=file.read()
+content_list=content.splitlines()
+file.close()
+
+csa_raw=content_list[8:8+number]
+
+for residue in csa_raw:
+    step1=residue.split()
+    if not step1:
+            continue
+    residue=step1[0]
+    csa=step1[2]
+    cs_a[residue.strip('N')]=csa
+
+csb_raw=content_list[10+number:10+(2*number)]
+
+for residue in csb_raw:
+    step1=residue.split()
+    if not step1:
+        continue
+    residue=step1[0]
+    csb=step1[2]
+    cs_b[residue.strip('N')]=csb
+    err=step1[4]
+    cs_b_error[residue.strip('N')]=err
+
+
+
+##Hey, If you wanted to put something to select only certain residues to print,
+##here would be a great place to put it
+
 
 ##plotting each residue##
 for key in residues1:
@@ -175,8 +219,10 @@ for key in residues1:
     ax.set_xlabel('Offset (ppm)', labelpad=15, fontsize=12)
     ax.set_ylabel('I/Io', labelpad=15, fontsize=12)
     fig.suptitle(key)
+    ax.vlines(x=120,ymin=min(y3acorr), ymax=max(y3acorr))
     plt.savefig(key)
-    plt.close()
+    plt.close()    
+    print(float(cs_a[key]))
 
 
 
