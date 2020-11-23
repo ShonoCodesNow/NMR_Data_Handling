@@ -24,7 +24,7 @@ f=open('fq3list', 'r')
 for line in f:
       if 'ppm' not in line:
           ppm_shift = line.strip('\n')
-          x.append(ppm_shift)
+          x.append(float(ppm_shift))
 f.close()
 
 
@@ -131,8 +131,7 @@ data3.close()
 
 
 file=open('parameters.fit', 'r')
-number = len(residues1)#number of residues will pull from residue list##
-##line 9-9+number will be CS_A
+number = len(residues1)#number of residues
 
 residuelist=[]
 cs_a={}
@@ -151,7 +150,7 @@ for residue in csa_raw:
             continue
     residue=step1[0]
     csa=step1[2]
-    cs_a[residue.strip('N')]=csa
+    cs_a[residue.strip('N')]=float(csa)
 
 csb_raw=content_list[10+number:10+(2*number)]
 
@@ -161,9 +160,9 @@ for residue in csb_raw:
         continue
     residue=step1[0]
     csb=step1[2]
-    cs_b[residue.strip('N')]=csb
+    cs_b[residue.strip('N')]=float(csb)
     err=step1[4]
-    cs_b_error[residue.strip('N')]=err
+    cs_b_error[residue.strip('N')]=float(err)
 
 
 
@@ -172,6 +171,9 @@ for residue in csb_raw:
 
 
 ##plotting each residue##
+
+xlabels=x[::8]
+
 for key in residues1:
     #pull data from dict for residue
     ten_hz_ys=residues1[key]
@@ -203,27 +205,32 @@ for key in residues1:
     y3bcorr=[x/y3b[0] for x in y3b]
     y3bcorr.pop(0)
 
+    cs_a_line=cs_a[key]
+    cs_b_line=cs_b[key]
+    cs_b_err=cs_b_error[key]
+    cs_b_err_upper=cs_b_line-cs_b_err
+    cs_b_err_lower=cs_b_line+cs_b_err
+
     #Actually plotting the shizz
 
-    tick_spacing = 6 #change this if you want x labels closer or further apart
+    plt.scatter(x, y1acorr, color=low, label='10 hz')
+    plt.plot(x, y1bcorr, color=low)
+    plt.scatter(x, y2acorr, color=med, label='25 hz')
+    plt.plot(x, y2bcorr, color=med)
+    plt.scatter(x, y3acorr, color=high, label='50 hz')
+    plt.plot(x, y3bcorr, color=high)
 
-    fig, ax = plt.subplots(1,1)
+    plt.axvspan(cs_b_err_lower,cs_b_err_upper, facecolor='grey', alpha=0.2)#these keep plotting to the far right of all the data for some reason... if I change to floats it smushes the data to the left. putting in a static number works though
+    plt.axvline(x=cs_a_line, color='black')
+    plt.axvline(x=cs_b_line, color='black', linestyle='--')
+    
+    plt.xticks(xlabels,xlabels)  
+    plt.xlabel('Offset (ppm)', labelpad=15, fontsize=12)
+    plt.ylabel('I/Io', labelpad=15, fontsize=12)
+    plt.suptitle(key)
 
-    ax.scatter(x, y1acorr, color=low, label='10 hz')
-    ax.plot(x, y1bcorr, color=low)
-    ax.scatter(x, y2acorr, color=med, label='25 hz')
-    ax.plot(x, y2bcorr, color=med)
-    ax.scatter(x, y3acorr, color=high, label='50 hz')
-    ax.plot(x, y3bcorr, color=high)
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
-    ax.set_xlabel('Offset (ppm)', labelpad=15, fontsize=12)
-    ax.set_ylabel('I/Io', labelpad=15, fontsize=12)
-    fig.suptitle(key)
-    ax.vlines(x=120,ymin=min(y3acorr), ymax=max(y3acorr))
-    plt.savefig(key)
+    plt.savefig(key, dpi=300, bbox_inches='tight', pad_inches=.1)
     plt.close()    
-    print(float(cs_a[key]))
-
 
 
 
