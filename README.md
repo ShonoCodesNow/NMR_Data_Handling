@@ -20,3 +20,10 @@ dir_File_to_Figs.py:
 and calculated I/Io values for the 3 frequencies. CS A, CS B, and CS B error also plotted.
 
 
+relax_Data_Parser.py:
+
+Intensity values (txt table) & vdlist -> text files for each CPMG frequency populated with residues and corresponding intensities
+
+Preps data table that's a pain to type out by hand for input into relax code.
+
+
