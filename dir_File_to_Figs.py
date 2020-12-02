@@ -225,7 +225,7 @@ for key in residues1:
     plt.axvline(x=cs_b_line, color='black', linestyle='--')
     
     plt.xticks(xlabels,xlabels)  
-    plt.xlabel('Offset (ppm)', labelpad=15, fontsize=12)
+    plt.xlabel('B1 position (ppm)', labelpad=15, fontsize=12)
     plt.ylabel('I/Io', labelpad=15, fontsize=12)
     plt.suptitle(key)
 
